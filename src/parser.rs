@@ -262,6 +262,17 @@ pub fn eval(line: String) -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
+pub fn eval_to_string(line: String) -> Result<String, Box<dyn Error>> {
+    let tokens = lex(line)?;
+    let mut token_iter: Peekable<Iter<'_, Token>> = tokens.iter().peekable();
+    let mut parser = Parser::new(&mut token_iter);
+    let result = parser.parse();
+    match result {
+        Ok(mut ast) => Ok(ast.eval().to_string()),
+        Err(e) => return Err(Box::new(e)),
+    }
+}
+
 fn get_line() -> String {
     print!("> ");
     std::io::stdout().flush().unwrap();

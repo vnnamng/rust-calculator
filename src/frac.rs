@@ -53,7 +53,7 @@ impl Frac {
     }
 
     pub fn is_bignum(&self) -> bool {
-        self.denominator == BigNum::from_str("1").unwrap()
+        self.denominator == BigNum::from_str("1").unwrap() || (self.numerator.is_zero())
     }
 
     pub fn to_bignum(&self) -> Result<BigNum, String> {

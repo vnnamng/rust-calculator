@@ -69,9 +69,19 @@ impl BigNum {
     }
 
     pub fn gcd(&self, other: &BigNum) -> BigNum {
-        if self.is_zero() || other.is_zero() {
-            panic!("GCD of zero is undefined");
+        // GCD of 2 zeroes is undefined, so panic
+        if self.is_zero() && other.is_zero() {
+            panic!("GCD of 2 zeroes is undefined");
         }
+        // GCD of a number and 0 is the number itself
+        if self.is_zero() {
+            return other.abs();
+        }
+
+        if other.is_zero() {
+            return self.abs();
+        }
+
         let mut a = self.abs();
         let mut b = other.abs();
         while !b.is_zero() {
