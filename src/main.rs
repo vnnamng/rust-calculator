@@ -1,5 +1,9 @@
 mod big_num;
+mod common;
 mod frac;
 mod parser;
 
-fn main() {}
+use parser::*;
+fn main() {
+    parser::run();
+}

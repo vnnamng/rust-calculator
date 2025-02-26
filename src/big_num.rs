@@ -6,6 +6,7 @@ use std::ops::{
 use std::str::FromStr;
 use std::string::ToString;
 
+use crate::frac::{Frac, IntoFrac};
 #[derive(Clone, Debug)]
 pub struct BigNum {
     sign: bool,   // true = positive, false = negative
@@ -80,6 +81,10 @@ impl BigNum {
         }
         a
     }
+
+    fn one() -> BigNum {
+        BigNum::from(vec![1], true)
+    }
 }
 
 // Implementing Display for BigNum
@@ -125,6 +130,12 @@ impl FromStr for BigNum {
         }
 
         Ok(BigNum { sign, num: digits })
+    }
+}
+
+impl IntoFrac for BigNum {
+    fn to_frac(self) -> Frac {
+        Frac::new(self, BigNum::one())
     }
 }
 
@@ -202,6 +213,14 @@ impl Add for BigNum {
     }
 }
 
+impl Add<Frac> for BigNum {
+    type Output = Frac;
+
+    fn add(self: BigNum, other: Frac) -> Frac {
+        self.to_frac() + other
+    }
+}
+
 impl AddAssign for BigNum {
     fn add_assign(&mut self, other: BigNum) {
         *self = self.clone() + other;
@@ -264,6 +283,14 @@ impl Sub for BigNum {
     }
 }
 
+impl Sub<Frac> for BigNum {
+    type Output = Frac;
+
+    fn sub(self: BigNum, other: Frac) -> Frac {
+        self.to_frac() - other
+    }
+}
+
 impl SubAssign for BigNum {
     fn sub_assign(&mut self, other: BigNum) {
         *self = self.clone() - other;
@@ -293,6 +320,14 @@ impl Mul for BigNum {
         } else {
             result
         }
+    }
+}
+
+impl Mul<Frac> for BigNum {
+    type Output = Frac;
+
+    fn mul(self: BigNum, other: Frac) -> Frac {
+        self.to_frac() * other
     }
 }
 
@@ -335,6 +370,14 @@ impl Div for BigNum {
             result.set_sign(true);
         }
         result
+    }
+}
+
+impl Div<Frac> for BigNum {
+    type Output = Frac;
+
+    fn div(self: BigNum, other: Frac) -> Frac {
+        self.to_frac() / other
     }
 }
 
