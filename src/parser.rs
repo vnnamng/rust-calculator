@@ -112,7 +112,7 @@ impl Expr {
             Expr::BinExpr(Operator::Divide, left, right) => {
                 let right_val = right.eval()?;
                 if right_val.is_zero() {
-                    Err(SyntaxError::new_parse_error("Division by zero".to_string()))
+                    Err(SyntaxError::new_parse_error("Division by Zero".to_string()))
                 } else {
                     Ok(left.eval()? / right_val)
                 }
@@ -276,11 +276,8 @@ pub fn eval_to_string(input: String) -> Result<String, Box<dyn Error>> {
     let tokens = lex(input)?;
     let mut token_iter: Peekable<Iter<'_, Token>> = tokens.iter().peekable();
     let mut parser = Parser::new(&mut token_iter);
-    let result = parser.parse();
-    match result {
-        Ok(mut ast) => Ok(format!("{}", ast.eval()?)),
-        Err(e) => return Err(Box::new(e)),
-    }
+    let mut result = parser.parse()?;
+    Ok(result.eval().map(|val| val.to_string())?)
 }
 
 fn get_line() -> String {
