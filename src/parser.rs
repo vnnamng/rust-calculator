@@ -102,15 +102,25 @@ pub enum Expr {
 }
 
 impl Expr {
-    pub fn eval(&mut self) -> Value {
+    pub fn eval(&mut self) -> Result<Value, SyntaxError> {
         match self {
-            Expr::ValExrp(num) => (*num).clone(),
-            Expr::UnaryExpr(Operator::Negative, expr) => -expr.eval(),
-            Expr::BinExpr(Operator::Add, left, right) => left.eval() + right.eval(),
-            Expr::BinExpr(Operator::Subtract, left, right) => left.eval() - right.eval(),
-            Expr::BinExpr(Operator::Multiply, left, right) => left.eval() * right.eval(),
-            Expr::BinExpr(Operator::Divide, left, right) => left.eval() / right.eval(),
-            _ => panic!("Unreachable code: for expr {:?}", self),
+            Expr::ValExrp(num) => Ok((*num).clone()),
+            Expr::UnaryExpr(Operator::Negative, expr) => Ok(-expr.eval()?),
+            Expr::BinExpr(Operator::Add, left, right) => Ok(left.eval()? + right.eval()?),
+            Expr::BinExpr(Operator::Subtract, left, right) => Ok(left.eval()? - right.eval()?),
+            Expr::BinExpr(Operator::Multiply, left, right) => Ok(left.eval()? * right.eval()?),
+            Expr::BinExpr(Operator::Divide, left, right) => {
+                let right_val = right.eval()?;
+                if right_val.is_zero() {
+                    Err(SyntaxError::new_parse_error("Division by zero".to_string()))
+                } else {
+                    Ok(left.eval()? / right_val)
+                }
+            }
+            _ => Err(SyntaxError::new_parse_error(format!(
+                "Unreachable code: for expr {:?}",
+                self
+            ))),
         }
     }
 }
@@ -255,7 +265,7 @@ pub fn eval(line: String) -> Result<(), Box<dyn Error>> {
     let mut parser = Parser::new(&mut token_iter);
     let result = parser.parse();
     match result {
-        Ok(mut ast) => println!("{}", ast.eval()),
+        Ok(mut ast) => println!("{}", ast.eval()?),
         Err(e) => return Err(Box::new(e)),
     }
 
@@ -268,7 +278,7 @@ pub fn eval_to_string(input: String) -> Result<String, Box<dyn Error>> {
     let mut parser = Parser::new(&mut token_iter);
     let result = parser.parse();
     match result {
-        Ok(mut ast) => Ok(format!("{}", ast.eval())),
+        Ok(mut ast) => Ok(format!("{}", ast.eval()?)),
         Err(e) => return Err(Box::new(e)),
     }
 }

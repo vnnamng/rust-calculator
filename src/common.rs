@@ -21,6 +21,13 @@ impl Value {
             },
         }
     }
+
+    pub fn is_zero(&self) -> bool {
+        match self {
+            Value::Number(num) => num.is_zero(),
+            Value::Frac(frac) => frac.is_zero(),
+        }
+    }
 }
 
 impl fmt::Display for Value {
