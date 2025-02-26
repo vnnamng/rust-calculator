@@ -11,8 +11,11 @@ pub struct Frac {
 }
 
 impl Frac {
-    fn simplify(&self) -> Frac {
-        let gcd = self.numerator.gcd(&self.denominator);
+    fn simplify(&self) -> Result<Frac, String> {
+        let gcd = self
+            .numerator
+            .gcd(&self.denominator)
+            .map_err(|e| e.to_string())?;
         let numerator = self.numerator.clone() / gcd.clone();
         let denominator = self.denominator.clone() / gcd;
 
@@ -23,14 +26,14 @@ impl Frac {
             (numerator, denominator)
         };
 
-        Frac {
+        Ok(Frac {
             numerator,
             denominator,
-        }
+        })
     }
 
     fn is_simplified(&self) -> bool {
-        self.numerator.gcd(&self.denominator) == BigNum::from_str("1").unwrap()
+        self.numerator.gcd(&self.denominator).unwrap() == BigNum::from_str("1").unwrap()
     }
 
     pub fn new(numerator: BigNum, denominator: BigNum) -> Self {
@@ -42,6 +45,7 @@ impl Frac {
             denominator,
         }
         .simplify()
+        .unwrap()
     }
 
     pub fn inverse(&self) -> Frac {
@@ -62,6 +66,10 @@ impl Frac {
         } else {
             Err("Fraction cannot be converted to BigNum".to_string())
         }
+    }
+
+    pub fn is_zero(&self) -> bool {
+        self.numerator.is_zero()
     }
 }
 

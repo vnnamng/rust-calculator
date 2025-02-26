@@ -68,18 +68,18 @@ impl BigNum {
         }
     }
 
-    pub fn gcd(&self, other: &BigNum) -> BigNum {
-        // GCD of 2 zeroes is undefined, so panic
+    pub fn gcd(&self, other: &BigNum) -> Result<BigNum, String> {
+        // GCD of 2 zeroes is undefined, so return an error
         if self.is_zero() && other.is_zero() {
-            panic!("GCD of 2 zeroes is undefined");
+            return Err("GCD of 2 zeroes is undefined".to_string());
         }
         // GCD of a number and 0 is the number itself
         if self.is_zero() {
-            return other.abs();
+            return Ok(other.abs());
         }
 
         if other.is_zero() {
-            return self.abs();
+            return Ok(self.abs());
         }
 
         let mut a = self.abs();
@@ -89,7 +89,7 @@ impl BigNum {
             b = a.clone() % b;
             a = temp;
         }
-        a
+        Ok(a)
     }
 
     fn one() -> BigNum {
@@ -739,7 +739,7 @@ mod tests {
             let num1 = BigNum::from(vec![1, 2, 3], true);
             let num2 = BigNum::from(vec![6, 0], true);
             let expected = BigNum::from(vec![3], true);
-            assert_eq!(num1.gcd(&num2), expected);
+            assert_eq!(num1.gcd(&num2).unwrap(), expected);
         }
 
         #[test]
@@ -756,7 +756,7 @@ mod tests {
             let num1 = BigNum::from(vec![1, 2, 3], false);
             let num2 = BigNum::from(vec![6, 0], true);
             let expected = BigNum::from(vec![3], true);
-            assert_eq!(num1.gcd(&num2), expected);
+            assert_eq!(num1.gcd(&num2).unwrap(), expected);
         }
 
         #[test]
@@ -764,12 +764,12 @@ mod tests {
             let num1 = BigNum::from(vec![1, 0], true);
             let num2 = BigNum::from(vec![3], true);
             let expected = BigNum::from(vec![1], true);
-            assert_eq!(num1.gcd(&num2), expected);
+            assert_eq!(num1.gcd(&num2).unwrap(), expected);
 
             let num3 = BigNum::from(vec![1, 0], false);
             let num4 = BigNum::from(vec![3], true);
             let expected = BigNum::from(vec![1], true);
-            assert_eq!(num3.gcd(&num4), expected);
+            assert_eq!(num3.gcd(&num4).unwrap(), expected);
         }
     }
 }
